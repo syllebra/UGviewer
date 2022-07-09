@@ -45,6 +45,7 @@ function displacechords(on)
     chords.style.height = (on ? "100%" : "");
     chords.style.zIndex = (on ? "1000" : "");
     //chords.style.background="#FFFFFF55";
+    return true
 }
 
 function setcolumns (nums) {
@@ -94,10 +95,10 @@ function setfullscreen (on)
     return "Page fullscreen set "+(on ?"ON":"OFF");
 }
 
-function togglefullview() {
+function togglefullview(nums) {
     var on = isfullscreen()
     on = !on
     setfullscreen(on)
-    setcolumns(on ? 4 : 1)
+    setcolumns(on ? nums : 1)
     displacechords(on)
 }

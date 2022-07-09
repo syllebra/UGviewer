@@ -167,27 +167,47 @@ public class MainActivity extends Activity {
         Log.d("HelpButton", "Help button clicked");
     }
 
+
+    protected void runJSfunction(String function)
+    {
+        try {
+            String script = function+";";
+            mWebView.evaluateJavascript(script, new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                    Log.d("output", value);
+                    //prints:"JavaScript executed successfully."
+                }
+            });
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected int columns = 4;
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
             Log.w("app", "UGviewerDBG:Keycode else: " + event);
-            if(event.getKeyCode() == KeyEvent.KEYCODE_A) {
-                try {
-                    String script = "togglefullview();";
-                    mWebView.evaluateJavascript(script, new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String value) {
-                            Log.d("output", value);
-                            //prints:"JavaScript executed successfully."
-                        }
-                    });
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return true;
+            switch(event.getKeyCode())
+            {
+                case KeyEvent.KEYCODE_F:
+                    runJSfunction("togglefullview("+columns+")");
+                    return true;
+                case KeyEvent.KEYCODE_A:
+                    runJSfunction("toggleautoscroll()");
+                    return true;
+                case KeyEvent.KEYCODE_MINUS:
+                    columns -= 1;
+                    if(columns<1)
+                        columns = 1;
+                    runJSfunction("setcolumns("+columns+")");
+                    return true;
             }
         }
+
         return super.dispatchKeyEvent(event);
     }
 
