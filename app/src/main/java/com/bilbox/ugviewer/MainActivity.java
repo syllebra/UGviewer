@@ -71,7 +71,33 @@ public class MainActivity extends Activity {
         mWebView = findViewById(R.id.main_webview);
 
         // Force links and redirects to open in the WebView instead of in a browser
-        mWebView.setWebViewClient(new WebViewClient());
+        mWebView.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                /*view.loadUrl("javascript:window.ANDROID_CLIENT.showSource("
+                        + "document.getElementsByTagName('html')[0].innerHTML);");
+                view.loadUrl("javascript:window.ANDROID_CLIENT.showDescription("
+                        + "document.querySelector('meta[name=\"share-description\"]').getAttribute('content')"
+                        + ");");*/
+                Log.w("app", "UGviewerDBG:Page reload" + url);
+
+                try {
+                    String script = loadTextFromAssets(MainActivity.this, "UGviewer.js", Charset.defaultCharset());
+                    mWebView.evaluateJavascript(script, new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String value) {
+                            Log.d("output", value);
+                            //prints:"JavaScript executed successfully."
+                        }
+                    });
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                super.onPageFinished(view, url);
+            }
+        });
 
         mWebView.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
 
@@ -86,7 +112,7 @@ public class MainActivity extends Activity {
 
         mWebView.getSettings().setSupportZoom(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
-        mWebView.getSettings().setDisplayZoomControls(true);
+        mWebView.getSettings().setDisplayZoomControls(false);
 
         mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         mWebView.setScrollbarFadingEnabled(false);
@@ -143,38 +169,11 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-
         if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
-            /*some custom functions*/
+            Log.w("app", "UGviewerDBG:Keycode else: " + event);
             if(event.getKeyCode() == KeyEvent.KEYCODE_A) {
-                Log.w("app", "UGviewerDBG:Keycode else: " + event);
-
-/*                mWebView.loadUrl("javascript:(function(){"+
-                        "l=document.getElementById('mA');"+
-                        "e=document.createEvent('HTMLEvents');"+
-                        "e.initEvent('click',true,true);"+
-                        "l.dispatchEvent(e);"+
-                        "})()");
-*/
-                //String script = "(function() { return document.getElementsByTagName(\"img\"); })();";
-/*                String script = "javascript: (function() {" +
-                        "var x = document.getElementsByTagName(\"button\"); var count = x.length; return count;" +
-                        "})();";
-
-                String script = "javascript:(function f() {"+
-                    "var btns = document.getElementsByTagName('button');"+
-                        "e=document.createEvent('HTMLEvents');"+
-                        "e.initEvent('click',true,true);"+
-                    "for (var i = 0, n = btns.length; i < n; i++) {"+
-                    "   if (btns[i].getAttribute('data-for') === 'autoscroll-tooltip') {"+
-                    "      btns[i].setAttribute('onclick', 'AndroidInterface.onClicked()');"+
-                    "      btns[i].dispatchEvent(e);"+
-                    "   }"+
-                    "}"+
-                    "})()";
-*/
                 try {
-                    String script = "javascript:(function f() {" + loadTextFromAssets(this, "test3.js", Charset.defaultCharset()) + "})()";
+                    String script = "togglefullview();";
                     mWebView.evaluateJavascript(script, new ValueCallback<String>() {
                         @Override
                         public void onReceiveValue(String value) {
@@ -183,13 +182,11 @@ public class MainActivity extends Activity {
                         }
                     });
                 }
-                catch (IOException e) {
+                catch (Exception e) {
                     e.printStackTrace();
                 }
-
                 return true;
             }
-
         }
         return super.dispatchKeyEvent(event);
     }
