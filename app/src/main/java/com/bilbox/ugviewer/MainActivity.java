@@ -36,6 +36,9 @@ public class MainActivity extends Activity {
         return charset == null ? new String(baos.toByteArray()) : new String(baos.toByteArray(), charset);
     }
 
+    enum PageType {OTHERS, TABS_LIST, TAB_CHORDS};
+    PageType pageType = PageType.OTHERS;
+
     private WebView mWebView = null;
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -64,17 +67,12 @@ public class MainActivity extends Activity {
                             //prints:"JavaScript executed successfully."
                         }
                     });
-
-                    if(url.contains("tabs.ultimate-guitar.com")) {
-                        loadTabOptions();
-                        runJSfunction("togglefullview(" + columns + ")");
-                    }
                 }
                 catch (IOException e) {
                     e.printStackTrace();
                 }
 
-
+                setupPage();
                 super.onPageFinished(view, url);
             }
         });
@@ -105,9 +103,8 @@ public class MainActivity extends Activity {
     @Override
     public void onResume(){
         super.onResume();
-
         Log.d("debug", "UGviewerDBG: ON RESUME !");
- }
+    }
 
     @Override
     public void onBackPressed() {
@@ -118,15 +115,41 @@ public class MainActivity extends Activity {
             System.exit(0);
             super.onBackPressed();
         }
- }
+    }
 
+    protected void setupPage() {
+        if (mWebView.getUrl().contains("tabs.ultimate-guitar.com")) {
+            pageType = PageType.TAB_CHORDS;
+            loadTabOptions();
+            toggleFullView();
+        }
+        else
+        if (mWebView.getUrl().contains("ultimate-guitar.com/user/mytabs")) {
+            pageType = PageType.TABS_LIST;
+            toggleFullView();
+        }
+    }
+
+    public void toggleFullView() {
+        switch(pageType) {
+            case TAB_CHORDS:
+                runJSfunction("toggle_tab_full_view(" + columns + ")");
+                break;
+            case TABS_LIST:
+                runJSfunction("set_tabs_list_all()");
+                runJSfunction("toggle_full_view(" + columns + ")");
+                break;
+            default:
+                runJSfunction("toggle_full_view(" + columns + ")");
+                break;
+        }
+    }
 
     @JavascriptInterface
     public void onClicked()
     {
         Log.d("HelpButton", "Help button clicked");
     }
-
 
     protected void runJSfunction(String function)
     {
@@ -168,7 +191,7 @@ public class MainActivity extends Activity {
             {
                 case KeyEvent.KEYCODE_F:
                 case KeyEvent.KEYCODE_0:
-                    runJSfunction("togglefullview("+columns+")");
+                    toggleFullView();
                     break;
                 case KeyEvent.KEYCODE_A:
                 case KeyEvent.KEYCODE_MEDIA_PLAY:

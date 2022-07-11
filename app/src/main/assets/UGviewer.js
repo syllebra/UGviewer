@@ -4,13 +4,14 @@ const tohide_selector =
         ",._3oGPQ"+ // Left menu
         ",._2bi9V"+ // Views number
         ",.tDXKF"+ // Difficulty
-        ",._27xzf"+ // Officaltabs, downloadpdf, etc...
+        ",._27xzf"+ // Official tabs, download pdf, etc...
         //",._3fm2e"+ // Chords
         ",._6aYQY"+ // Strumming
         ",._3bzfG"+ // Footer
         ",#shots"+ // Shots
         ",#comments"+ // Shots
         ",._39xi3"+ // Footer 2
+        ",.Wvegf"+ // Options toolbar
         "";
 
 const right_panel_width = "210px"
@@ -149,7 +150,7 @@ function isfullscreen()
     return on
 }
 
-function setfullscreen (on)
+function setfullscreen (on, right_space = "0px")
 {
     var tohide = document.querySelectorAll(tohide_selector);
 
@@ -164,7 +165,7 @@ function setfullscreen (on)
     page.children[0].style.margin = (on? "0px": "");
 
     page.style.position = (on? "absolute" : "");
-    page.style.width = (on? "calc(100% - "+right_panel_width+")": "");
+    page.style.width = (on? "calc(100% - "+right_space+")": "");
     page.style.height = (on? "100%": "");
     page.style.left = (on? "0px": "");
     //page.style.right = (on? "0px": "");
@@ -178,12 +179,26 @@ function setfullscreen (on)
     return "Page fullscreen set "+(on ?"ON":"OFF");
 }
 
-function togglefullview(nums) {
+function toggle_tab_full_view(nums) {
+    var on = isfullscreen()
+    on = !on
+    setfullscreen(on, right_panel_width)
+    setcolumns(on ? nums : 1)
+    displacechords(on)
+}
+
+function toggle_full_view(nums) {
     var on = isfullscreen()
     on = !on
     setfullscreen(on)
     setcolumns(on ? nums : 1)
-    displacechords(on)
+}
+
+function set_tabs_list_all() {
+    var grp = document.getElementsByClassName("z7o1r");
+    if(!grp || grp.length ==0 | grp[0].children.length <3)
+        return "Unable to find button"
+    generate_click(grp[0].children[2]);
 }
 
 setup_buttons();
