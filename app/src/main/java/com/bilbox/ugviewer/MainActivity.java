@@ -63,6 +63,9 @@ public class MainActivity extends Activity {
                             //prints:"JavaScript executed successfully."
                         }
                     });
+
+                    if(url.contains("tabs.ultimate-guitar.com"))
+                        runJSfunction("togglefullview("+columns+")");
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -114,34 +117,6 @@ public class MainActivity extends Activity {
         }
  }
 
-/*    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if ((event.getFlags() & KeyEvent.FLAG_CANCELED_LONG_PRESS) == 0){
-            //if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER)
-            {
-                Log.d("Debug", "UGviewerDBG: keyup ::  "+keyCode);
-                return true;
-            }
-        }
-        return super.onKeyUp(keyCode, event);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event){
-        if(keyCode == 10010){
-            Toast.makeText(this, "UGviewerDBG:: Button X pressed", Toast.LENGTH_SHORT).show();
-            //pulsarBotonTV();
-            return true;
-        }
-        //....
-        else{
-            Toast.makeText(this, "UGviewerDBG: ANOTHER KEY"+keyCode, Toast.LENGTH_SHORT).show();
-            Log.w("app", "UGviewerDBG: Keycode else: " + keyCode);
-            return super.onKeyDown(keyCode, event);
-        }
-
-    }
-*/
 
     @JavascriptInterface
     public void onClicked()
@@ -201,9 +176,7 @@ public class MainActivity extends Activity {
                     break;
                 case KeyEvent.KEYCODE_M:
                 case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                    columns -= 1;
-                    if(columns<1)
-                        columns = 1;
+                    columns += 1;
                     runJSfunction("setcolumns("+columns+")");
                     break;
                 case KeyEvent.KEYCODE_1:
