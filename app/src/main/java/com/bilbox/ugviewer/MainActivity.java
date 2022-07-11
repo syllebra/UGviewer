@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.AlarmClock;
 import android.util.Log;
@@ -64,8 +65,10 @@ public class MainActivity extends Activity {
                         }
                     });
 
-                    if(url.contains("tabs.ultimate-guitar.com"))
-                        runJSfunction("togglefullview("+columns+")");
+                    if(url.contains("tabs.ultimate-guitar.com")) {
+                        loadTabOptions();
+                        runJSfunction("togglefullview(" + columns + ")");
+                    }
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -144,6 +147,19 @@ public class MainActivity extends Activity {
 
     protected int columns = 4;
 
+    protected void saveTabOptions()
+    {
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(mWebView.getUrl()+"_COLS", columns);
+        editor.apply();
+    }
+    protected void loadTabOptions()
+    {
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        columns = sharedPref.getInt(mWebView.getUrl()+"_COLS", 4);
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
@@ -173,11 +189,13 @@ public class MainActivity extends Activity {
                     if(columns<1)
                         columns = 1;
                     runJSfunction("setcolumns("+columns+")");
+                    saveTabOptions();
                     break;
                 case KeyEvent.KEYCODE_M:
                 case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
                     columns += 1;
                     runJSfunction("setcolumns("+columns+")");
+                    saveTabOptions();
                     break;
                 case KeyEvent.KEYCODE_1:
                 case KeyEvent.KEYCODE_2:
