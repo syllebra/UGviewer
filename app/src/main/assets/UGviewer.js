@@ -15,6 +15,49 @@ const tohide_selector =
 
 const right_panel_width = "210px"
 
+document.dec_font_button = null
+document.inc_font_button = null
+document.dec_transpose_button = null
+document.inc_transpose_button = null
+
+function setup_buttons()
+{
+    var grp = document.getElementsByClassName('hXfrh');
+    for (var i = 0, n = grp.length; i < n; i++)
+    {
+         //if(grp[i].closest(".-j5K1"))
+         //   continue;
+          title = grp[i].previousElementSibling;
+          if(!title)
+            continue;
+
+          if(title.innerText.includes('TRANSPOSE'))
+          {
+            document.dec_transpose_button = grp[i].children[0]
+            document.inc_transpose_button = grp[i].children[2]
+          }
+          else
+          if(title.innerText.includes('FONT'))
+          {
+            document.dec_font_button = grp[i].children[0]
+            document.inc_font_button = grp[i].children[2]
+            continue;
+          }
+    }
+}
+
+function generate_click(button)
+{
+    if(!button)
+        return "button not found"
+
+    e=document.createEvent('HTMLEvents');
+    e.initEvent('click',true,true);
+    button.dispatchEvent(e);
+ }
+
+function dec_font() { return generate_click(document.dec_font_button);}
+
 function toggleautoscroll() {
     var btns = document.getElementsByTagName('button');
     e=document.createEvent('HTMLEvents');
@@ -102,3 +145,5 @@ function togglefullview(nums) {
     setcolumns(on ? nums : 1)
     displacechords(on)
 }
+
+setup_buttons();

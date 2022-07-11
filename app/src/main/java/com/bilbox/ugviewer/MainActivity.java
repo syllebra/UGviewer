@@ -40,33 +40,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/*
-        // Get the intent
-        Intent intent = getIntent();
-        if (AlarmClock.ACTION_SET_ALARM.equals(intent.getAction())) {
-            if (intent.hasExtra(AlarmClock.EXTRA_HOUR)) {
-                // Step 2: get the rest of the intent extras and set an alarm
-                Log.d("OnKey", "UGviewerDBG: key pressed!");
-                Toast.makeText(MainActivity.this, "key pressed!", Toast.LENGTH_SHORT).show();
-            }
-        }
 
-
-/*
-        String query = "";
-        if (getIntent().getAction() != null && getIntent().getAction().equals("com.google.android.gms.actions.SEARCH_ACTION")) {
-            query = getIntent().getStringExtra(SearchManager.QUERY);
-            Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
-        }
-*/
- 
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        Log.d("debug", "UGviewerDBG: ON RESUME !");
 
         mWebView = findViewById(R.id.main_webview);
 
@@ -119,16 +93,24 @@ public class MainActivity extends Activity {
 
         //webView.loadUrl("https://tabs.ultimate-guitar.com/tab/johnny-hallyday/je-te-promets-chords-1107944");
         mWebView.loadUrl("https://www.ultimate-guitar.com/user/mytabs");///tab/print?auto_export=1&flats=0&font_size=0&id=1107944&is_ukulele=0&simplified=0&transpose=0");
+
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Log.d("debug", "UGviewerDBG: ON RESUME !");
+ }
 
     @Override
     public void onBackPressed() {
         if(mWebView.canGoBack()) {
             mWebView.goBack();
         } else {
-            super.onBackPressed();
-
             this.finishAffinity();
+            System.exit(0);
+            super.onBackPressed();
         }
  }
 
@@ -194,17 +176,45 @@ public class MainActivity extends Activity {
             switch(event.getKeyCode())
             {
                 case KeyEvent.KEYCODE_F:
+                case KeyEvent.KEYCODE_0:
                     runJSfunction("togglefullview("+columns+")");
-                    return true;
+                    break;
                 case KeyEvent.KEYCODE_A:
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
                     runJSfunction("toggleautoscroll()");
-                    return true;
+                    break;
+                case KeyEvent.KEYCODE_T:
+                    runJSfunction("generate_click(document.dec_font_button)");
+                    break;
+                case KeyEvent.KEYCODE_Y:
+                    runJSfunction("generate_click(document.inc_font_button)");
+                    break;
                 case KeyEvent.KEYCODE_MINUS:
+                case KeyEvent.KEYCODE_MEDIA_REWIND:
                     columns -= 1;
                     if(columns<1)
                         columns = 1;
                     runJSfunction("setcolumns("+columns+")");
-                    return true;
+                    break;
+                case KeyEvent.KEYCODE_PLUS:
+                case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                    columns -= 1;
+                    if(columns<1)
+                        columns = 1;
+                    runJSfunction("setcolumns("+columns+")");
+                    break;
+                case KeyEvent.KEYCODE_1:
+                case KeyEvent.KEYCODE_2:
+                case KeyEvent.KEYCODE_3:
+                case KeyEvent.KEYCODE_4:
+                case KeyEvent.KEYCODE_5:
+                case KeyEvent.KEYCODE_6:
+                case KeyEvent.KEYCODE_7:
+                case KeyEvent.KEYCODE_8:
+                case KeyEvent.KEYCODE_9:
+                    columns = (int)(event.getKeyCode())-(int)(KeyEvent.KEYCODE_0);
+                    runJSfunction("setcolumns("+columns+")");
+                    break;
             }
         }
 
