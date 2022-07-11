@@ -15,6 +15,7 @@ const tohide_selector =
 
 const right_panel_width = "210px"
 
+document.chords_button = [null,null,null]
 document.dec_font_button = null
 document.inc_font_button = null
 document.dec_transpose_button = null
@@ -44,6 +45,33 @@ function setup_buttons()
             continue;
           }
     }
+
+    var btn = document.querySelectorAll("button._14yTH")
+    for (var i = 0, n = btn.length; i < n; i++)
+    {
+        span = btn[i].querySelector(":scope > span")
+        if(!span)
+            continue;
+        text = span.innerText.toUpperCase();
+        if(text.includes("GUITAR"))
+            document.chords_button[0] = btn[i];
+        else if(text.includes("UKULELE"))
+            document.chords_button[1] = btn[i];
+        else if(text.includes("PIANO"))
+            document.chords_button[2] = btn[i];
+    }
+}
+
+function get_active_chords_type()
+{
+    for (var i = 0; i < document.chords_button.length;i++)
+    {
+        if(!document.chords_button[i])
+            continue
+        if(document.chords_button[i].classList.contains("sS6gK"))
+            return i
+    }
+    return -1
 }
 
 function generate_click(button)
@@ -55,6 +83,18 @@ function generate_click(button)
     e.initEvent('click',true,true);
     button.dispatchEvent(e);
  }
+
+function toggle_chords_type()
+{
+    var i = get_active_chords_type()
+    if(i <0)
+        return "Chord buttons not defined"
+
+    i = (i+1)%document.chords_button.length
+
+    generate_click(document.chords_button[i])
+}
+
 
 function dec_font() { return generate_click(document.dec_font_button);}
 

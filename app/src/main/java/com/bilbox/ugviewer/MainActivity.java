@@ -183,20 +183,23 @@ public class MainActivity extends Activity {
                 case KeyEvent.KEYCODE_MEDIA_PLAY:
                     runJSfunction("toggleautoscroll()");
                     break;
-                case KeyEvent.KEYCODE_T:
+                case KeyEvent.KEYCODE_O:
                     runJSfunction("generate_click(document.dec_font_button)");
                     break;
-                case KeyEvent.KEYCODE_Y:
+                case KeyEvent.KEYCODE_P:
                     runJSfunction("generate_click(document.inc_font_button)");
                     break;
-                case KeyEvent.KEYCODE_MINUS:
+                case KeyEvent.KEYCODE_C:
+                    runJSfunction("toggle_chords_type()");
+                    break;
+                case KeyEvent.KEYCODE_L:
                 case KeyEvent.KEYCODE_MEDIA_REWIND:
                     columns -= 1;
                     if(columns<1)
                         columns = 1;
                     runJSfunction("setcolumns("+columns+")");
                     break;
-                case KeyEvent.KEYCODE_PLUS:
+                case KeyEvent.KEYCODE_M:
                 case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
                     columns -= 1;
                     if(columns<1)
