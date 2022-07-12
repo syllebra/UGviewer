@@ -6,15 +6,20 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.AlarmClock;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -23,6 +28,28 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 public class MainActivity extends Activity {
+
+    public void visible(){
+        WebView webview = (WebView) findViewById(R.id.main_webview);
+        ImageView logo = (ImageView) findViewById(R.id.imageView1);
+        ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar1);
+        TextView version = (TextView) findViewById(R.id.textView1);
+        logo.setVisibility(View.GONE);
+        bar.setVisibility(View.GONE);
+        version.setVisibility(View.GONE);
+        webview.setVisibility(View.VISIBLE);
+    }
+
+    public void unvisible(){
+        WebView webview = (WebView) findViewById(R.id.main_webview);
+        ImageView logo = (ImageView) findViewById(R.id.imageView1);
+        ProgressBar bar = (ProgressBar) findViewById(R.id.progressBar1);
+        TextView version = (TextView) findViewById(R.id.textView1);
+        webview.setVisibility(View.GONE);
+        logo.setVisibility(View.VISIBLE);
+        bar.setVisibility(View.VISIBLE);
+        version.setVisibility(View.VISIBLE);
+    }
 
     public static String loadTextFromAssets(Context context, String assetsPath, Charset charset) throws IOException {
         InputStream is = context.getAssets().open(assetsPath);
@@ -45,12 +72,20 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         mWebView = findViewById(R.id.main_webview);
 
         // Force links and redirects to open in the WebView instead of in a browser
         mWebView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                Log.w("app", "UGviewerDBG:Page started" + url);
+                unvisible();
+            }
+
+            @Override
             public void onPageFinished(WebView view, String url) {
+
                 /*view.loadUrl("javascript:window.ANDROID_CLIENT.showSource("
                         + "document.getElementsByTagName('html')[0].innerHTML);");
                 view.loadUrl("javascript:window.ANDROID_CLIENT.showDescription("
@@ -73,6 +108,7 @@ public class MainActivity extends Activity {
                 }
 
                 setupPage();
+                visible();
                 super.onPageFinished(view, url);
             }
         });
