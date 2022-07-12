@@ -230,14 +230,18 @@ public class MainActivity extends Activity {
             switch(event.getKeyCode())
             {
                 case KeyEvent.KEYCODE_F:
-                case KeyEvent.KEYCODE_0:
                     toggleFullView();
                     break;
+                case KeyEvent.KEYCODE_TV_INPUT:
+                    toggleFullView();
+                    return true;
                 case KeyEvent.KEYCODE_A:
                 case KeyEvent.KEYCODE_MEDIA_PLAY:
+                case 4056: // TCL small command "Multicolor"
                     runJSfunction("toggleautoscroll()");
                     break;
                 case KeyEvent.KEYCODE_O:
+                case KeyEvent.KEYCODE_PROG_RED:
                     font_size = font_size-2;
                     if(font_size<5)
                         font_size = 5;
@@ -246,12 +250,14 @@ public class MainActivity extends Activity {
                     //runJSfunction("generate_click(document.dec_font_button)");
                     break;
                 case KeyEvent.KEYCODE_P:
+                case KeyEvent.KEYCODE_PROG_GREEN:
                     font_size = font_size+2;
                     runJSfunction("force_current_font_size("+font_size+")");
                     saveTabOptions();
                     //runJSfunction("generate_click(document.inc_font_button)");
                     break;
                 case KeyEvent.KEYCODE_C:
+                case 4020: // TCL command "T_ROND"
                     runJSfunction("toggle_chords_type()");
                     break;
                 case KeyEvent.KEYCODE_L:
