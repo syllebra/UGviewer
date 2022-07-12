@@ -170,6 +170,7 @@ public class MainActivity extends Activity {
         switch(pageType) {
             case TAB_CHORDS:
                 runJSfunction("toggle_tab_full_view(" + columns + ")");
+                runJSfunction("force_current_font_size("+font_size+")");
                 break;
             case TABS_LIST:
                 runJSfunction("set_tabs_list_all()");
@@ -205,18 +206,21 @@ public class MainActivity extends Activity {
     }
 
     protected int columns = 4;
+    protected int font_size = 15;
 
     protected void saveTabOptions()
     {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(mWebView.getUrl()+"_COLS", columns);
+        editor.putInt(mWebView.getUrl()+"_FONT_SIZE", font_size);
         editor.apply();
     }
     protected void loadTabOptions()
     {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         columns = sharedPref.getInt(mWebView.getUrl()+"_COLS", 4);
+        font_size = sharedPref.getInt(mWebView.getUrl()+"_FONT_SIZE", 15);
     }
 
     @Override
@@ -234,10 +238,18 @@ public class MainActivity extends Activity {
                     runJSfunction("toggleautoscroll()");
                     break;
                 case KeyEvent.KEYCODE_O:
-                    runJSfunction("generate_click(document.dec_font_button)");
+                    font_size = font_size-2;
+                    if(font_size<5)
+                        font_size = 5;
+                    runJSfunction("force_current_font_size("+font_size+")");
+                    saveTabOptions();
+                    //runJSfunction("generate_click(document.dec_font_button)");
                     break;
                 case KeyEvent.KEYCODE_P:
-                    runJSfunction("generate_click(document.inc_font_button)");
+                    font_size = font_size+2;
+                    runJSfunction("force_current_font_size("+font_size+")");
+                    saveTabOptions();
+                    //runJSfunction("generate_click(document.inc_font_button)");
                     break;
                 case KeyEvent.KEYCODE_C:
                     runJSfunction("toggle_chords_type()");

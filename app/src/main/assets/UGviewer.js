@@ -201,4 +201,21 @@ function set_tabs_list_all() {
     generate_click(grp[0].children[2]);
 }
 
+function get_current_font_size()
+{
+    var grp = document.querySelectorAll("pre._3hukP");
+    if(!grp || grp.length == 0)
+            return null;
+    return grp[0].style.fontSize;
+}
+
+function force_current_font_size(font_size)
+{
+    var grp = document.querySelectorAll("pre._3hukP");
+    if(!grp || grp.length == 0)
+            return "Unable to find font size";
+    grp[0].style.fontSize = font_size+"px";
+    return "Font size forced to "+font_size;
+}
+
 setup_buttons();
