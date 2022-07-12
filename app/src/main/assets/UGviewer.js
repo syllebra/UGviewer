@@ -218,4 +218,20 @@ function force_current_font_size(font_size)
     return "Font size forced to "+font_size;
 }
 
+function set_tabs_style()
+{
+    var tab_style = "span._3rlxz {overflow: hidden;}"
+    var style=document.createElement('style');
+    style.type='text/css';
+    if(style.styleSheet){
+        style.styleSheet.cssText=tab_style;
+    }else{
+        style.appendChild(document.createTextNode(tab_style));
+    }
+
+    document.getElementsByTagName('head')[0].appendChild(style);
+
+}
+
 setup_buttons();
+set_tabs_style();
