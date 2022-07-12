@@ -64,9 +64,15 @@ public class MainActivity extends Activity {
     }
 
     enum PageType {OTHERS, TABS_LIST, TAB_CHORDS};
-    PageType pageType = PageType.OTHERS;
+    PageType mPageType = PageType.OTHERS;
+
+    enum CommandMode {NORMAL, SIZE, OTHERS}
+    CommandMode mCommandMode = CommandMode.NORMAL;
 
     private WebView mWebView = null;
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -86,11 +92,6 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
 
-                /*view.loadUrl("javascript:window.ANDROID_CLIENT.showSource("
-                        + "document.getElementsByTagName('html')[0].innerHTML);");
-                view.loadUrl("javascript:window.ANDROID_CLIENT.showDescription("
-                        + "document.querySelector('meta[name=\"share-description\"]').getAttribute('content')"
-                        + ");");*/
                 Log.w("app", "UGviewerDBG:Page reload" + url);
 
                 try {
@@ -142,45 +143,6 @@ public class MainActivity extends Activity {
         Log.d("debug", "UGviewerDBG: ON RESUME !");
     }
 
-    @Override
-    public void onBackPressed() {
-        if(mWebView.canGoBack()) {
-            mWebView.goBack();
-        } else {
-            this.finishAffinity();
-            System.exit(0);
-            super.onBackPressed();
-        }
-    }
-
-    protected void setupPage() {
-        if (mWebView.getUrl().contains("tabs.ultimate-guitar.com")) {
-            pageType = PageType.TAB_CHORDS;
-            loadTabOptions();
-            toggleFullView();
-        }
-        else
-        if (mWebView.getUrl().contains("ultimate-guitar.com/user/mytabs")) {
-            pageType = PageType.TABS_LIST;
-            toggleFullView();
-        }
-    }
-
-    public void toggleFullView() {
-        switch(pageType) {
-            case TAB_CHORDS:
-                runJSfunction("toggle_tab_full_view(" + columns + ")");
-                runJSfunction("force_current_font_size("+font_size+")");
-                break;
-            case TABS_LIST:
-                runJSfunction("set_tabs_list_all()");
-                runJSfunction("toggle_full_view(" + columns + ")");
-                break;
-            default:
-                runJSfunction("toggle_full_view(" + columns + ")");
-                break;
-        }
-    }
 
     @JavascriptInterface
     public void onClicked()
@@ -223,6 +185,64 @@ public class MainActivity extends Activity {
         font_size = sharedPref.getInt(mWebView.getUrl()+"_FONT_SIZE", 15);
     }
 
+    protected void setupPage() {
+        if (mWebView.getUrl().contains("tabs.ultimate-guitar.com")) {
+            mPageType = PageType.TAB_CHORDS;
+            loadTabOptions();
+            toggleFullView();
+        }
+        else
+        if (mWebView.getUrl().contains("ultimate-guitar.com/user/mytabs")) {
+            mPageType = PageType.TABS_LIST;
+            toggleFullView();
+        }
+    }
+
+    public void toggleFullView() {
+        switch(mPageType) {
+            case TAB_CHORDS:
+                runJSfunction("toggle_tab_full_view(" + columns + ")");
+                runJSfunction("force_current_font_size("+font_size+")");
+                break;
+            case TABS_LIST:
+                runJSfunction("set_tabs_list_all()");
+                runJSfunction("toggle_full_view(" + columns + ")");
+                break;
+            default:
+                runJSfunction("toggle_full_view(" + columns + ")");
+                break;
+        }
+    }
+
+    public void changeFontSize(int change)
+    {
+        font_size += change;
+        if(font_size<5)
+            font_size = 5;
+        runJSfunction("force_current_font_size("+font_size+")");
+        saveTabOptions();
+    }
+
+    public void changeColumnsCount(int change)
+    {
+        columns += change;
+        if(columns<1)
+            columns = 5;
+        runJSfunction("setcolumns("+columns+")");
+        saveTabOptions();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mWebView.canGoBack()) {
+            mWebView.goBack();
+        } else {
+            this.finishAffinity();
+            System.exit(0);
+            super.onBackPressed();
+        }
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
@@ -242,19 +262,11 @@ public class MainActivity extends Activity {
                     break;
                 case KeyEvent.KEYCODE_O:
                 case KeyEvent.KEYCODE_PROG_RED:
-                    font_size = font_size-2;
-                    if(font_size<5)
-                        font_size = 5;
-                    runJSfunction("force_current_font_size("+font_size+")");
-                    saveTabOptions();
-                    //runJSfunction("generate_click(document.dec_font_button)");
+                    changeFontSize(-2);
                     break;
                 case KeyEvent.KEYCODE_P:
                 case KeyEvent.KEYCODE_PROG_GREEN:
-                    font_size = font_size+2;
-                    runJSfunction("force_current_font_size("+font_size+")");
-                    saveTabOptions();
-                    //runJSfunction("generate_click(document.inc_font_button)");
+                    changeFontSize(+2);
                     break;
                 case KeyEvent.KEYCODE_C:
                 case 4020: // TCL command "T_ROND"
@@ -262,17 +274,11 @@ public class MainActivity extends Activity {
                     break;
                 case KeyEvent.KEYCODE_L:
                 case KeyEvent.KEYCODE_MEDIA_REWIND:
-                    columns -= 1;
-                    if(columns<1)
-                        columns = 1;
-                    runJSfunction("setcolumns("+columns+")");
-                    saveTabOptions();
+                    changeColumnsCount(-1);
                     break;
                 case KeyEvent.KEYCODE_M:
                 case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                    columns += 1;
-                    runJSfunction("setcolumns("+columns+")");
-                    saveTabOptions();
+                    changeColumnsCount(+1);
                     break;
                 case KeyEvent.KEYCODE_1:
                 case KeyEvent.KEYCODE_2:
@@ -283,8 +289,7 @@ public class MainActivity extends Activity {
                 case KeyEvent.KEYCODE_7:
                 case KeyEvent.KEYCODE_8:
                 case KeyEvent.KEYCODE_9:
-                    columns = (int)(event.getKeyCode())-(int)(KeyEvent.KEYCODE_0);
-                    runJSfunction("setcolumns("+columns+")");
+                    changeColumnsCount((int)(event.getKeyCode())-(int)(KeyEvent.KEYCODE_0)-columns);
                     break;
             }
         }
