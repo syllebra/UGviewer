@@ -232,8 +232,40 @@ public class MainActivity extends Activity {
         saveTabOptions();
     }
 
+    public void changeTranspose(int semitones)
+    {
+        if(semitones<0)
+            runJSfunction("generate_click(document.dec_transpose_button)");
+        else if(semitones>0)
+            runJSfunction("generate_click(document.inc_transpose_button)");
+        //saveTabOptions();
+    }
+
+    public void setCommandMode(CommandMode mode)
+    {
+        mCommandMode = mode;
+        if(mCommandMode!=CommandMode.NORMAL)
+            runJSfunction("showInfoZone(\""+mCommandMode.toString()+"\")");
+        else
+            runJSfunction("showInfoZone(\"\")");
+    }
+
+    public void toggleCommandMode()
+    {
+        switch(mCommandMode) {
+            case NORMAL: setCommandMode(CommandMode.OTHERS); break;
+            case OTHERS: setCommandMode(CommandMode.SIZE); break;
+            case SIZE: setCommandMode(CommandMode.NORMAL); break;
+        }
+        Log.w("app","Changed command mode to:" + mCommandMode);
+    }
+
     @Override
     public void onBackPressed() {
+        if(mCommandMode != CommandMode.NORMAL) {
+            setCommandMode(CommandMode.NORMAL);
+        }
+        else
         if(mWebView.canGoBack()) {
             mWebView.goBack();
         } else {
@@ -245,41 +277,46 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+
         if ((event.getAction() == KeyEvent.ACTION_DOWN)) {
             Log.w("app", "UGviewerDBG:Keycode else: " + event);
             switch(event.getKeyCode())
             {
                 case KeyEvent.KEYCODE_F:
-                    toggleFullView();
-                    break;
                 case KeyEvent.KEYCODE_TV_INPUT:
                     toggleFullView();
-                    return true;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_F;
                 case KeyEvent.KEYCODE_A:
                 case KeyEvent.KEYCODE_MEDIA_PLAY:
                 case 4056: // TCL small command "Multicolor"
                     runJSfunction("toggleautoscroll()");
-                    break;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_A;
                 case KeyEvent.KEYCODE_O:
                 case KeyEvent.KEYCODE_PROG_RED:
                     changeFontSize(-2);
-                    break;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_O;
                 case KeyEvent.KEYCODE_P:
                 case KeyEvent.KEYCODE_PROG_GREEN:
                     changeFontSize(+2);
-                    break;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_P;
                 case KeyEvent.KEYCODE_C:
                 case 4020: // TCL command "T_ROND"
-                    runJSfunction("toggle_chords_type()");
-                    break;
+                    runJSfunction("toggle_chords_type(1)");
+                    return event.getKeyCode() != KeyEvent.KEYCODE_C;
                 case KeyEvent.KEYCODE_L:
                 case KeyEvent.KEYCODE_MEDIA_REWIND:
                     changeColumnsCount(-1);
-                    break;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_L;
                 case KeyEvent.KEYCODE_M:
                 case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
                     changeColumnsCount(+1);
-                    break;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_M;
+                case KeyEvent.KEYCODE_U:
+                    changeTranspose(-1);
+                    return event.getKeyCode() != KeyEvent.KEYCODE_L;
+                case KeyEvent.KEYCODE_I:
+                    changeTranspose(+1);
+                    return event.getKeyCode() != KeyEvent.KEYCODE_M;
                 case KeyEvent.KEYCODE_1:
                 case KeyEvent.KEYCODE_2:
                 case KeyEvent.KEYCODE_3:
@@ -291,6 +328,71 @@ public class MainActivity extends Activity {
                 case KeyEvent.KEYCODE_9:
                     changeColumnsCount((int)(event.getKeyCode())-(int)(KeyEvent.KEYCODE_0)-columns);
                     break;
+
+                case KeyEvent.KEYCODE_S:
+                case KeyEvent.KEYCODE_MENU:
+                    toggleCommandMode();
+                    return event.getKeyCode() != KeyEvent.KEYCODE_S;
+            }
+
+            if(mCommandMode == CommandMode.SIZE)
+            {
+                switch(event.getKeyCode())
+                {
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                        changeFontSize(-2);
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                        changeFontSize(2);
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        changeColumnsCount(-1);
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        changeColumnsCount(1);
+                        return true;
+                }
+            }
+            else
+            if(mCommandMode == CommandMode.OTHERS)
+            {
+                switch(event.getKeyCode())
+                {
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                        runJSfunction("toggle_chords_type(-1)");
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                        runJSfunction("toggle_chords_type(1)");
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        changeTranspose(-1);
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        changeTranspose(1);
+                        return true;
+                }
+            }
+
+        }
+        else
+        {
+            switch(event.getKeyCode())
+            {
+                case KeyEvent.KEYCODE_TV_INPUT:
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
+                case 4056: // TCL small command "Multicolor"
+                case KeyEvent.KEYCODE_PROG_RED:
+                case KeyEvent.KEYCODE_PROG_GREEN:
+                case 4020: // TCL command "T_ROND"
+                case KeyEvent.KEYCODE_MEDIA_REWIND:
+                case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                case KeyEvent.KEYCODE_MENU:
+                    return true;
+                case KeyEvent.KEYCODE_DPAD_DOWN:
+                case KeyEvent.KEYCODE_DPAD_UP:
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    return mCommandMode != CommandMode.NORMAL;
             }
         }
 

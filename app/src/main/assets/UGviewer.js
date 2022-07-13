@@ -85,13 +85,13 @@ function generate_click(button)
     button.dispatchEvent(e);
  }
 
-function toggle_chords_type()
+function toggle_chords_type(direction=1)
 {
     var i = get_active_chords_type()
     if(i <0)
         return "Chord buttons not defined"
 
-    i = (i+1)%document.chords_button.length
+    i = (i+direction)%document.chords_button.length
 
     generate_click(document.chords_button[i])
 }
@@ -233,5 +233,34 @@ function set_tabs_style()
 
 }
 
+function createInfoZone()
+{
+    const square = document.createElement('div');
+    square.id = "info_zone";
+    square.innerHTML = "<b>TEST</b>";
+    square.style.fontSize = "30px";
+    square.style.height = '0';
+    square.style.width = '120px';
+    square.style.zIndex = '20000';
+    square.style.position = 'fixed';
+    square.style.backgroundColor = 'rgb(0,0,0)';
+    square.style.backgroundColor = 'rgb(0,0,0,0.7)';
+    square.style.textAlign = 'center';
+    square.style.margin = 'auto';
+    square.style.overflowX= 'hidden';
+    square.style.transition= '0.5s';
+    square.style.right = 0;
+    square.style.bottom = 0;
+    document.body.appendChild(square)
+}
+
+function showInfoZone(text="")
+{
+    var square = document.getElementById("info_zone");
+    square.style.height = (text == "" ? '0px' : '50px');
+    square.children[0].innerHTML = text;
+}
+
 setup_buttons();
 set_tabs_style();
+createInfoZone()
