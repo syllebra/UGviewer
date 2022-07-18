@@ -1,18 +1,26 @@
-const page_selector = "_1HVlc"
-const tohide_selector =
-        ".n5ucf"+ // banner
-        ",._3oGPQ"+ // Left menu
-        ",._2bi9V"+ // Views number
-        ",.tDXKF"+ // Difficulty
-        ",._27xzf"+ // Official tabs, download pdf, etc...
-        //",._3fm2e"+ // Chords
-        ",._6aYQY"+ // Strumming
-        ",._3bzfG"+ // Footer
-        ",#shots"+ // Shots
-        ",#comments"+ // Shots
-        ",._39xi3"+ // Footer 2
-        ",.Wvegf"+ // Options toolbar
-        "";
+const page_selector = "main > div:nth-child(2)"
+const tab_selector = page_selector + " > article"
+const options_toolbar_selector = tab_selector + " > div > article > :nth-child(6)";
+const tohide_selector = [
+        "body > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)", // banner
+        "main > div:nth-child(1)",// Left menu
+        tab_selector + " > section > section > div > div", // Views number, Difficulty, Author, Edit, Favorite...
+        tab_selector + " > :nth-child(2)", // Official tabs, download pdf, etc...
+        tab_selector + " > div > article > :nth-child(3)", // Strumming
+        tab_selector + " > div > article > :nth-child(5)", // Footer
+        options_toolbar_selector, // Options toolbar
+        //",._3fm2e": 0, // Chords
+        tab_selector + " > div > article > footer", // Footer
+        "#shots", // Shots
+        "#comments", // Comment
+        "body > div > div > footer", // Footer 2
+        "aside", // DOwnload pdf, etc...
+        "#tab-bottom-controls", // Tab bottom controls
+];
+
+const chords_selector = tab_selector + " > div > article > :nth-child(2)" // Chords
+const chords_buttons_selector = chords_selector + " > div > nav > button"
+const tab_chords_selector = "code > pre";
 
 const right_panel_width = "210px"
 
@@ -24,7 +32,7 @@ document.inc_transpose_button = null
 
 function setup_buttons()
 {
-    var grp = document.getElementsByClassName('hXfrh');
+    var grp = document.querySelectorAll(options_toolbar_selector+ " article > section> div > div > span")
     for (var i = 0, n = grp.length; i < n; i++)
     {
          //if(grp[i].closest(".-j5K1"))
@@ -47,7 +55,7 @@ function setup_buttons()
           }
     }
 
-    var btn = document.querySelectorAll("button._14yTH")
+    var btn = document.querySelectorAll(chords_buttons_selector)
     for (var i = 0, n = btn.length; i < n; i++)
     {
         span = btn[i].querySelector(":scope > span")
@@ -65,14 +73,20 @@ function setup_buttons()
 
 function get_active_chords_type()
 {
+    var max_num = 0;
+    var active = 0;
     for (var i = 0; i < document.chords_button.length;i++)
     {
         if(!document.chords_button[i])
             continue
-        if(document.chords_button[i].classList.contains("sS6gK"))
-            return i
+
+        if(document.chords_button[i].classList.length > max_num)
+        {
+            active = i;
+            max_num = document.chords_button[i].classList.length;
+        }
     }
-    return -1
+    return active
 }
 
 function generate_click(button)
@@ -113,12 +127,12 @@ function toggleautoscroll() {
 
 function displacechords(on)
 {
-    var chords = document.getElementsByClassName("_3fm2e");
+    var chords = document.querySelectorAll(chords_selector);
     if(chords.length == 0)
         return false;
     chords = chords[0]
 
-    chords.className += " _2M9MP"
+    //chords.className += " _2M9MP"
 
     chords.style.position = (on ? "fixed" : "");
     chords.style.right = (on ? "0px" : "");
@@ -129,11 +143,12 @@ function displacechords(on)
     chords.style.height = (on ? "100%" : "");
     chords.style.zIndex = (on ? "1000" : "");
     //chords.style.background="#FFFFFF55";
+    chords.style.background="#F8F8F8";
     return true
 }
 
 function setcolumns (nums) {
-  const tabsSelector = 'code > pre';
+  const tabsSelector = tab_chords_selector;
   const tabWrapper = document.querySelector(tabsSelector)
   if (tabWrapper) {
     tabWrapper.style.columnCount = nums
@@ -142,8 +157,8 @@ function setcolumns (nums) {
 
 function isfullscreen()
 {
-    var elements = document.getElementsByClassName(page_selector);
-    if(elements.length == 0)
+    var elements = document.querySelectorAll(page_selector);
+    if(elements.length < 1)
         return "Page not found";
 
     var on = (elements[0].style.position != "");
@@ -152,10 +167,8 @@ function isfullscreen()
 
 function setfullscreen (on, right_space = "0px")
 {
-    var tohide = document.querySelectorAll(tohide_selector);
-
-    var elements = document.getElementsByClassName(page_selector);
-    if(elements.length == 0)
+    var elements = document.querySelectorAll(page_selector);
+    if(elements.length < 1)
         return "Page not found";
 
     var page = elements[0];
@@ -173,8 +186,12 @@ function setfullscreen (on, right_space = "0px")
     //page.style.bottom = (on? "0px": "");
     page.style.margin = (on? "0px": "");
 
-    for (var i = 0, n = tohide.length; i < n; i++)
-        tohide[i].style.display = (on ? "none" : "");
+    for (var i = 0, n = tohide_selector.length; i < n; i++)
+    {
+        var tohide = document.querySelectorAll(tohide_selector[i]);
+        for (var j = 0; j<tohide.length; j++)
+            tohide[j].style.display = (on ? "none" : "");
+    }
 
     return "Page fullscreen set "+(on ?"ON":"OFF");
 }
@@ -195,7 +212,7 @@ function toggle_full_view(nums) {
 }
 
 function set_tabs_list_all() {
-    var grp = document.getElementsByClassName("z7o1r");
+    var grp = document.querySelectorAll("main > div > div > section > div > div > nav");
     if(!grp || grp.length ==0 | grp[0].children.length <3)
         return "Unable to find button"
     generate_click(grp[0].children[2]);
@@ -203,7 +220,7 @@ function set_tabs_list_all() {
 
 function get_current_font_size()
 {
-    var grp = document.querySelectorAll("pre._3hukP");
+    var grp = document.querySelectorAll(tab_chords_selector);
     if(!grp || grp.length == 0)
             return null;
     return grp[0].style.fontSize;
@@ -211,7 +228,7 @@ function get_current_font_size()
 
 function force_current_font_size(font_size)
 {
-    var grp = document.querySelectorAll("pre._3hukP");
+    var grp = document.querySelectorAll(tab_chords_selector);
     if(!grp || grp.length == 0)
             return "Unable to find font size";
     grp[0].style.fontSize = font_size+"px";
@@ -220,7 +237,7 @@ function force_current_font_size(font_size)
 
 function set_tabs_style()
 {
-    var tab_style = "span._3rlxz {overflow: hidden;}"
+    var tab_style = tab_chords_selector+" > span {overflow: hidden;}"
     var style=document.createElement('style');
     style.type='text/css';
     if(style.styleSheet){
