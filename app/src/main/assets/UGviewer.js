@@ -1,16 +1,16 @@
 const page_selector = "main > div:nth-child(2)"
 const tab_selector = page_selector + " > article"
-const options_toolbar_selector = tab_selector + " > div > article > :nth-child(6)";
+const options_toolbar_selector = tab_selector + " > section > article > :nth-child(6)";
 const tohide_selector = [
         "body > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)", // banner
         "main > div:nth-child(1)",// Left menu
-        tab_selector + " > section > section > div > div", // Views number, Difficulty, Author, Edit, Favorite...
-        tab_selector + " > :nth-child(2)", // Official tabs, download pdf, etc...
-        tab_selector + " > div > article > :nth-child(3)", // Strumming
-        tab_selector + " > div > article > :nth-child(5)", // Footer
+        tab_selector + " > section > div", // Views number, Difficulty, Author, Edit, Favorite...
+        tab_selector + " > section > section", // Official tabs, download pdf, etc...
+        tab_selector + " > section > article > :nth-child(3)", // Strumming
+        tab_selector + " > section > article > :nth-child(5)", // Footer
         options_toolbar_selector, // Options toolbar
         //",._3fm2e": 0, // Chords
-        tab_selector + " > div > article > footer", // Footer
+        tab_selector + " > section > article > footer", // Footer
         "#shots", // Shots
         "#comments", // Comment
         "body > div > div > footer", // Footer 2
@@ -18,7 +18,7 @@ const tohide_selector = [
         "#tab-bottom-controls", // Tab bottom controls
 ];
 
-const chords_selector = tab_selector + " > div > article > :nth-child(2)" // Chords
+const chords_selector = tab_selector + " > section > article > :nth-child(2)" // Chords
 const chords_buttons_selector = chords_selector + " > div > nav > button"
 const tab_chords_selector = "code > pre";
 

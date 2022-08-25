@@ -319,10 +319,10 @@ public class MainActivity extends Activity {
                     return event.getKeyCode() != KeyEvent.KEYCODE_M;
                 case KeyEvent.KEYCODE_U:
                     changeTranspose(-1);
-                    return event.getKeyCode() != KeyEvent.KEYCODE_L;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_U;
                 case KeyEvent.KEYCODE_I:
                     changeTranspose(+1);
-                    return event.getKeyCode() != KeyEvent.KEYCODE_M;
+                    return event.getKeyCode() != KeyEvent.KEYCODE_I;
                 case KeyEvent.KEYCODE_1:
                 case KeyEvent.KEYCODE_2:
                 case KeyEvent.KEYCODE_3:
