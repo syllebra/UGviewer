@@ -1,28 +1,56 @@
-const page_selector = "main > div:nth-child(2)"
-const tab_selector = page_selector + " > article"
-const options_toolbar_selector = tab_selector + " > section > article > :nth-child(6)";
-const tohide_selector = [
-        "body > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)", // banner
-        "main > div:nth-child(1)",// Left menu
-        tab_selector + " > section > div", // Views number, Difficulty, Author, Edit, Favorite...
-        tab_selector + " > section > section", // Official tabs, download pdf, etc...
-        tab_selector + " > section > article > :nth-child(3)", // Strumming
-        tab_selector + " > section > article > :nth-child(5)", // Footer
-        options_toolbar_selector, // Options toolbar
-        //",._3fm2e": 0, // Chords
-        tab_selector + " > section > article > footer", // Footer
-        "#shots", // Shots
-        "#comments", // Comment
-        "body > div > div > footer", // Footer 2
-        "aside", // DOwnload pdf, etc...
-        "#tab-bottom-controls", // Tab bottom controls
-];
+var config_string = `
+{
+    "right_panel_width"  : "210px",
+    "page_selector": "main > div:nth-child(2)",
+    "tab_selector": "[[page_selector]] > article",
+    "options_toolbar_selector": "[[tab_selector]] > section > article > :nth-child(6)",
+    "options_toolbar_buttons_selector": "[[options_toolbar_selector]] > article > section> div > div > span",
+    "chords_selector": "[[tab_selector]] > section > article > :nth-child(2)",
+    "chords_buttons_selector": "[[chords_selector]] > div > nav > button",
+    "chords_buttons_inner_selector" : ":scope > span",
+    "tab_chords_selector": "code > pre",
+    "tabs_list_selector": "main > div > div > section > div > div > nav",
+    "tohide_selector":
+        {
+            "body > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)": "banner",
+            "main > div:nth-child(1)": "Left menu",
+            "[[tab_selector]] > section > div": "Views number, Difficulty, Author, Edit, Favorite...",
+            "[[tab_selector]] > section > section": "Official tabs, download pdf, etc...",
+            "[[tab_selector]] > section > article > :nth-child(3)": "Strumming",
+            "[[tab_selector]] > section > article > :nth-child(5)": "Footer",
+            "[[options_toolbar_selector]]": "Options toolbar",
+            "[[tab_selector]] > section > article > footer": "Footer",
+            "#shots": "Shots",
+            "#comments": "Comment",
+            "body > div > div > footer": "Footer 2",
+            "aside": "Download pdf, etc...",
+            "#tab-bottom-controls": "Tab bottom controls"
+        }
+}
+`;
 
-const chords_selector = tab_selector + " > section > article > :nth-child(2)" // Chords
-const chords_buttons_selector = chords_selector + " > div > nav > button"
-const tab_chords_selector = "code > pre";
+config = null
+function parse_config()
+{
+    // Initial parse
+    tmp = JSON.parse(config_string);
 
-const right_panel_width = "210px"
+    var reg = /(?<=\[\[).+?(?=\])/g;
+    var result;
+    var shortcuts = new Set();
+    while((result = reg.exec(config_string)) !== null)
+        shortcuts.add(result[0]);
+
+    for (let item of shortcuts)
+    {
+        config_string = config_string.replaceAll("[["+item+"]]", tmp[item])
+        tmp = JSON.parse(config_string);
+    }
+
+    console.log(config_string)
+    config = JSON.parse(config_string);
+}
+parse_config()
 
 document.chords_button = [null,null,null]
 document.dec_font_button = null
@@ -32,7 +60,7 @@ document.inc_transpose_button = null
 
 function setup_buttons()
 {
-    var grp = document.querySelectorAll(options_toolbar_selector+ " article > section> div > div > span")
+    var grp = document.querySelectorAll(config["options_toolbar_buttons_selector"])
     for (var i = 0, n = grp.length; i < n; i++)
     {
          //if(grp[i].closest(".-j5K1"))
@@ -55,10 +83,10 @@ function setup_buttons()
           }
     }
 
-    var btn = document.querySelectorAll(chords_buttons_selector)
+    var btn = document.querySelectorAll(config["chords_buttons_selector"])
     for (var i = 0, n = btn.length; i < n; i++)
     {
-        span = btn[i].querySelector(":scope > span")
+        span = btn[i].querySelector(config["chords_buttons_inner_selector"])
         if(!span)
             continue;
         text = span.innerText.toUpperCase();
@@ -127,7 +155,7 @@ function toggleautoscroll() {
 
 function displacechords(on)
 {
-    var chords = document.querySelectorAll(chords_selector);
+    var chords = document.querySelectorAll(config["chords_selector"]);
     if(chords.length == 0)
         return false;
     chords = chords[0]
@@ -139,7 +167,7 @@ function displacechords(on)
     chords.style.top = (on ? "0px" : "");
     chords.style.margin = (on ? "0px" : "");
     chords.style.padding = (on ? "10px" : "");
-    chords.style.width = (on ? right_panel_width : "");
+    chords.style.width = (on ? config["right_panel_width"] : "");
     chords.style.height = (on ? "100%" : "");
     chords.style.zIndex = (on ? "1000" : "");
     //chords.style.background="#FFFFFF55";
@@ -148,7 +176,7 @@ function displacechords(on)
 }
 
 function setcolumns (nums) {
-  const tabsSelector = tab_chords_selector;
+  const tabsSelector = config["tab_chords_selector"];
   const tabWrapper = document.querySelector(tabsSelector)
   if (tabWrapper) {
     tabWrapper.style.columnCount = nums
@@ -157,7 +185,7 @@ function setcolumns (nums) {
 
 function isfullscreen()
 {
-    var elements = document.querySelectorAll(page_selector);
+    var elements = document.querySelectorAll(config["page_selector"]);
     if(elements.length < 1)
         return "Page not found";
 
@@ -167,7 +195,7 @@ function isfullscreen()
 
 function setfullscreen (on, right_space = "0px")
 {
-    var elements = document.querySelectorAll(page_selector);
+    var elements = document.querySelectorAll(config["page_selector"]);
     if(elements.length < 1)
         return "Page not found";
 
@@ -186,9 +214,11 @@ function setfullscreen (on, right_space = "0px")
     //page.style.bottom = (on? "0px": "");
     page.style.margin = (on? "0px": "");
 
-    for (var i = 0, n = tohide_selector.length; i < n; i++)
+    var to_hide_sel = config["tohide_selector"]
+    for (var ths in to_hide_sel)
     {
-        var tohide = document.querySelectorAll(tohide_selector[i]);
+    console.log(ths)
+        var tohide = document.querySelectorAll(ths);
         for (var j = 0; j<tohide.length; j++)
             tohide[j].style.display = (on ? "none" : "");
     }
@@ -199,7 +229,7 @@ function setfullscreen (on, right_space = "0px")
 function toggle_tab_full_view(nums) {
     var on = isfullscreen()
     on = !on
-    setfullscreen(on, right_panel_width)
+    setfullscreen(on, config["right_panel_width"])
     setcolumns(on ? nums : 1)
     displacechords(on)
 }
@@ -212,7 +242,7 @@ function toggle_full_view(nums) {
 }
 
 function set_tabs_list_all() {
-    var grp = document.querySelectorAll("main > div > div > section > div > div > nav");
+    var grp = document.querySelectorAll(config["tabs_list_selector"]);
     if(!grp || grp.length ==0 | grp[0].children.length <3)
         return "Unable to find button"
     generate_click(grp[0].children[2]);
@@ -220,7 +250,7 @@ function set_tabs_list_all() {
 
 function get_current_font_size()
 {
-    var grp = document.querySelectorAll(tab_chords_selector);
+    var grp = document.querySelectorAll(config["tab_chords_selector"]);
     if(!grp || grp.length == 0)
             return null;
     return grp[0].style.fontSize;
@@ -228,7 +258,7 @@ function get_current_font_size()
 
 function force_current_font_size(font_size)
 {
-    var grp = document.querySelectorAll(tab_chords_selector);
+    var grp = document.querySelectorAll(config["tab_chords_selector"]);
     if(!grp || grp.length == 0)
             return "Unable to find font size";
     grp[0].style.fontSize = font_size+"px";
@@ -237,7 +267,7 @@ function force_current_font_size(font_size)
 
 function set_tabs_style()
 {
-    var tab_style = tab_chords_selector+" > span {overflow: hidden;}"
+    var tab_style = config["tab_chords_selector"]+" > span {overflow: hidden;}"
     var style=document.createElement('style');
     style.type='text/css';
     if(style.styleSheet){
