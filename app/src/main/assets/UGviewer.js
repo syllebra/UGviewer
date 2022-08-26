@@ -50,7 +50,19 @@ function parse_config()
     console.log(config_string)
     config = JSON.parse(config_string);
 }
-parse_config()
+
+function load_config()
+{
+    var url = 'https://raw.githubusercontent.com/syllebra/UGviewer/main/json/config.json';
+    fetch(url)
+    .then(res => config_string=res.text())
+    .then(out =>
+      console.log('Raw loaded json config text ', out))
+    .catch(err => console.log(err));
+
+    parse_config()
+}
+
 
 document.chords_button = [null,null,null]
 document.dec_font_button = null

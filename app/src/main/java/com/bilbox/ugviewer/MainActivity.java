@@ -23,9 +23,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 
 public class MainActivity extends Activity {
@@ -99,6 +103,27 @@ public class MainActivity extends Activity {
             public void onPageFinished(WebView view, String url) {
 
                 Log.w("app", "UGviewerDBG:Page reload" + url);
+
+//                try {
+//
+//                    URL urljs = new URL("https://raw.githubusercontent.com/syllebra/UGviewer/main/app/src/main/assets/UGviewer.js");
+//
+//                    // read text returned by server
+//                    BufferedReader in = new BufferedReader(new InputStreamReader(urljs.openStream()));
+//
+//                    String line;
+//                    while ((line = in.readLine()) != null) {
+//                        System.out.println(line);
+//                    }
+//                    in.close();
+//
+//                }
+//                catch (MalformedURLException e) {
+//                    System.out.println("Malformed URL: " + e.getMessage());
+//                }
+//                catch (IOException e) {
+//                    System.out.println("I/O Error: " + e.getMessage());
+//                }
 
                 try {
                     String script = loadTextFromAssets(MainActivity.this, "UGviewer.js", Charset.defaultCharset());
@@ -192,6 +217,7 @@ public class MainActivity extends Activity {
     }
 
     protected void setupPage() {
+        runJSfunction("load_config()");
         if (mWebView.getUrl().contains("tabs.ultimate-guitar.com")) {
             mPageType = PageType.TAB_CHORDS;
             loadTabOptions();
