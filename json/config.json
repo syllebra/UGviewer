@@ -1,0 +1,28 @@
+{
+  "right_panel_width"  : "210px",
+  "page_selector": "main > div:nth-child(2)",
+  "tab_selector": "[[page_selector]] > article",
+  "options_toolbar_selector": "[[tab_selector]] > section > article > :nth-child(6)",
+  "options_toolbar_buttons_selector": "[[options_toolbar_selector]] > article > section> div > div > span",
+  "chords_selector": "[[tab_selector]] > section > article > :nth-child(2)",
+  "chords_buttons_selector": "[[chords_selector]] > div > nav > button",
+  "chords_buttons_inner_selector" : ":scope > span",
+  "tab_chords_selector": "code > pre",
+  "tabs_list_selector": "main > div > div > section > div > div > nav",
+  "tohide_selector":
+  {
+    "body > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)": "banner",
+    "main > div:nth-child(1)": "Left menu",
+    "[[tab_selector]] > section > div": "Views number, Difficulty, Author, Edit, Favorite...",
+    "[[tab_selector]] > section > section": "Official tabs, download pdf, etc...",
+    "[[tab_selector]] > section > article > :nth-child(3)": "Strumming",
+    "[[tab_selector]] > section > article > :nth-child(5)": "Footer",
+    "[[options_toolbar_selector]]": "Options toolbar",
+    "[[tab_selector]] > section > article > footer": "Footer",
+    "#shots": "Shots",
+    "#comments": "Comment",
+    "body > div > div > footer": "Footer 2",
+    "aside": "Download pdf, etc...",
+    "#tab-bottom-controls": "Tab bottom controls"
+  }
+}
