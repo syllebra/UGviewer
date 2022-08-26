@@ -130,8 +130,7 @@ public class MainActivity extends Activity {
                     mWebView.evaluateJavascript(script, new ValueCallback<String>() {
                         @Override
                         public void onReceiveValue(String value) {
-                            Log.d("output", value);
-                            //prints:"JavaScript executed successfully."
+                            Log.d("JavaScript executed successfully.", value);
                         }
                     });
                 }
@@ -139,8 +138,6 @@ public class MainActivity extends Activity {
                     e.printStackTrace();
                 }
 
-                setupPage();
-                visible();
                 super.onPageFinished(view, url);
             }
         });
@@ -174,6 +171,17 @@ public class MainActivity extends Activity {
         Log.d("debug", "UGviewerDBG: ON RESUME !");
     }
 
+    @JavascriptInterface
+    public void onJSfullyLoad()
+    {
+        mWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                setupPage();
+                visible();
+            }
+        });
+    }
 
     @JavascriptInterface
     public void onClicked()
@@ -217,7 +225,6 @@ public class MainActivity extends Activity {
     }
 
     protected void setupPage() {
-        runJSfunction("load_config()");
         if (mWebView.getUrl().contains("tabs.ultimate-guitar.com")) {
             mPageType = PageType.TAB_CHORDS;
             loadTabOptions();
@@ -227,6 +234,7 @@ public class MainActivity extends Activity {
         if (mWebView.getUrl().contains("ultimate-guitar.com/user/mytabs")) {
             mPageType = PageType.TABS_LIST;
             toggleFullView();
+
         }
     }
 
