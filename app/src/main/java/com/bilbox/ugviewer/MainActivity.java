@@ -130,7 +130,7 @@ public class MainActivity extends Activity {
                     mWebView.evaluateJavascript(script, new ValueCallback<String>() {
                         @Override
                         public void onReceiveValue(String value) {
-                            Log.d("JavaScript executed successfully.", value);
+                            Log.d("log", value);
                         }
                     });
                 }
@@ -145,6 +145,7 @@ public class MainActivity extends Activity {
         mWebView.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
 
         mWebView.addJavascriptInterface(this, "AndroidInterface");
+        mWebView.clearCache(true);
 
         mWebView.getSettings().setDomStorageEnabled(true);
         mWebView.getSettings().setAppCacheEnabled(false);

@@ -60,6 +60,7 @@ function load_config(callback)
 {
     var url = 'https://raw.githubusercontent.com/syllebra/UGviewer/main/json/config.json';
     console.log("Loading config from "+ url)
+
     return fetch(url)
     .then(function(res)
          {
