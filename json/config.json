@@ -1,5 +1,4 @@
 {
-  "right_panel_width"  : "210px",
   "page_selector": "main > div:nth-child(2)",
   "tab_selector": "[[page_selector]] > article",
   "options_toolbar_selector": "[[tab_selector]] > section > article > :nth-child(6)",
@@ -19,6 +18,8 @@
     "[[tab_selector]] > section > article > :nth-child(5)": "Footer",
     "[[options_toolbar_selector]]": "Options toolbar",
     "[[tab_selector]] > section > article > footer": "Footer",
+    "[[chords_selector]] > header": "Chords title",
+    "[[chords_selector]] > div > nav": "Chords type buttons",
     "#shots": "Shots",
     "#comments": "Comment",
     "body > div > div > footer": "Footer 2",
