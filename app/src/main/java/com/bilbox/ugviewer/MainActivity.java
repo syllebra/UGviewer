@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
     enum PageType {OTHERS, TABS_LIST, TAB_CHORDS};
     PageType mPageType = PageType.OTHERS;
 
-    enum CommandMode {NORMAL, SIZE, OTHERS}
+    enum CommandMode {NORMAL, SIZE, CHORDS_POS, CHORDS_SIZE, OTHERS}
     CommandMode mCommandMode = CommandMode.NORMAL;
 
     private WebView mWebView = null;
@@ -209,6 +209,9 @@ public class MainActivity extends Activity {
 
     protected int columns = 4;
     protected int font_size = 15;
+    protected int chords_pos = 1;
+    protected int chords_size = 210;
+
 
     protected void saveTabOptions()
     {
@@ -216,6 +219,8 @@ public class MainActivity extends Activity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(mWebView.getUrl()+"_COLS", columns);
         editor.putInt(mWebView.getUrl()+"_FONT_SIZE", font_size);
+        editor.putInt(mWebView.getUrl()+"_CHORDS_POS", chords_pos);
+        editor.putInt(mWebView.getUrl()+"_CHORDS_SIZE", chords_size);
         editor.apply();
     }
     protected void loadTabOptions()
@@ -223,6 +228,8 @@ public class MainActivity extends Activity {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         columns = sharedPref.getInt(mWebView.getUrl()+"_COLS", 4);
         font_size = sharedPref.getInt(mWebView.getUrl()+"_FONT_SIZE", 15);
+        chords_pos = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_POS", 1);
+        chords_size = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_SIZE", 210);
     }
 
     protected void setupPage() {
@@ -242,15 +249,15 @@ public class MainActivity extends Activity {
     public void toggleFullView() {
         switch(mPageType) {
             case TAB_CHORDS:
-                runJSfunction("toggle_tab_full_view(" + columns + ")");
+                runJSfunction("toggle_tab_full_view(" + columns + ","+chords_pos+","+chords_size+")");
                 runJSfunction("force_current_font_size("+font_size+")");
                 break;
             case TABS_LIST:
                 runJSfunction("set_tabs_list_all()");
-                runJSfunction("toggle_full_view(" + columns + ")");
+                runJSfunction("toggle_full_view(" + columns + ","+chords_pos+","+0+")");
                 break;
             default:
-                runJSfunction("toggle_full_view(" + columns + ")");
+                runJSfunction("toggle_full_view(" + columns+ ","+chords_pos+","+0+")");
                 break;
         }
     }
@@ -270,6 +277,22 @@ public class MainActivity extends Activity {
         if(columns<1)
             columns = 5;
         runJSfunction("setcolumns("+columns+")");
+        saveTabOptions();
+    }
+
+    public void changeChordsPanelPos(int newpos)
+    {
+        chords_pos = newpos;
+        runJSfunction("change_chords_panel("+chords_pos+","+chords_size+")");
+        saveTabOptions();
+    }
+
+    public void changeChordsPanelSize(int change)
+    {
+        chords_size += change;
+        if(chords_size<10)
+            chords_size = 10;
+        runJSfunction("change_chords_panel("+chords_pos+","+chords_size+")");
         saveTabOptions();
     }
 
@@ -294,9 +317,11 @@ public class MainActivity extends Activity {
     public void toggleCommandMode()
     {
         switch(mCommandMode) {
-            case NORMAL: setCommandMode(CommandMode.OTHERS); break;
-            case OTHERS: setCommandMode(CommandMode.SIZE); break;
-            case SIZE: setCommandMode(CommandMode.NORMAL); break;
+            case NORMAL: setCommandMode(CommandMode.SIZE); break;
+            case SIZE: setCommandMode(CommandMode.CHORDS_POS); break;
+            case CHORDS_POS: setCommandMode(CommandMode.CHORDS_SIZE); break;
+            case CHORDS_SIZE: setCommandMode(CommandMode.OTHERS); break;
+            case OTHERS: setCommandMode(CommandMode.NORMAL); break;
         }
         Log.w("app","Changed command mode to:" + mCommandMode);
     }
@@ -391,6 +416,32 @@ public class MainActivity extends Activity {
                         return true;
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
                         changeColumnsCount(1);
+                        return true;
+                }
+            }
+            else
+            if(mCommandMode == CommandMode.CHORDS_POS)
+            {
+                switch(event.getKeyCode())
+                {
+                    case KeyEvent.KEYCODE_DPAD_UP: changeChordsPanelPos(0); return true;
+                    case KeyEvent.KEYCODE_DPAD_RIGHT: changeChordsPanelPos(1); return true;
+                    case KeyEvent.KEYCODE_DPAD_DOWN: changeChordsPanelPos(2); return true;
+                    case KeyEvent.KEYCODE_DPAD_LEFT: changeChordsPanelPos(3); return true;
+                }
+            }
+            else
+            if(mCommandMode == CommandMode.CHORDS_SIZE)
+            {
+                switch(event.getKeyCode())
+                {
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        changeChordsPanelSize(-20);
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        changeChordsPanelSize(20);
                         return true;
                 }
             }

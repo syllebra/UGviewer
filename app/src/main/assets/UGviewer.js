@@ -1,6 +1,5 @@
 /*var config_string = `
 {
-    "right_panel_width"  : "210px",
     "page_selector": "main > div:nth-child(2)",
     "tab_selector": "[[page_selector]] > article",
     "options_toolbar_selector": "[[tab_selector]] > section > article > :nth-child(6)",
@@ -187,8 +186,11 @@ function toggleautoscroll() {
     }
 }
 
-function displacechords(on)
+//0: top, 1: right, 2: bottom, 4: left
+function displacechords(on, pos=1, size=0)
 {
+    var sz = ""+size+"px";
+
     var chords = document.querySelectorAll(document.config["chords_selector"]);
     if(chords.length == 0)
         return false;
@@ -197,15 +199,59 @@ function displacechords(on)
     //chords.className += " _2M9MP"
 
     chords.style.position = (on ? "fixed" : "");
-    chords.style.right = (on ? "0px" : "");
-    chords.style.top = (on ? "0px" : "");
     chords.style.margin = (on ? "0px" : "");
     chords.style.padding = (on ? "10px" : "");
-    chords.style.width = (on ? document.config["right_panel_width"] : "");
-    chords.style.height = (on ? "100%" : "");
     chords.style.zIndex = (on ? "1000" : "");
     //chords.style.background="#FFFFFF55";
     chords.style.background="#F8F8F8";
+
+    if(on)
+    {
+        switch(pos)
+        {
+        case 0:
+            chords.style.top = "0px";
+            chords.style.bottom= "";
+            chords.style.left= "0px"
+            chords.style.right = "";
+            chords.style.width = "100%";
+            chords.style.height = sz;
+            break;
+        case 1:
+            chords.style.top = "0px";
+            chords.style.bottom= "";
+            chords.style.left= ""
+            chords.style.right = "0px";
+            chords.style.width = sz;
+            chords.style.height = "100%";
+            break;
+        case 2:
+            chords.style.top = "";
+            chords.style.bottom= "0px";
+            chords.style.left= "0px"
+            chords.style.right = "";
+            chords.style.width = "100%";
+            chords.style.height = sz;
+            break;
+        case 3:
+            chords.style.top = "0px";
+            chords.style.bottom= "";
+            chords.style.left= "0px"
+            chords.style.right = "";
+            chords.style.width = sz;
+            chords.style.height = "100%";
+            break;
+        }
+    }
+    else
+    {
+            chords.style.top = "";
+            chords.style.bottom= "";
+            chords.style.left= "";
+            chords.style.right = "";
+            chords.style.width = "";
+            chords.style.height = "";
+    }
     return true
 }
 
@@ -227,7 +273,7 @@ function isfullscreen()
     return on
 }
 
-function setfullscreen (on, right_space = "0px")
+function setfullscreen (on, pos=1, size = 0)
 {
     var elements = document.querySelectorAll(document.config["page_selector"]);
     if(elements.length < 1)
@@ -240,13 +286,56 @@ function setfullscreen (on, right_space = "0px")
     page.children[0].style.margin = (on? "0px": "");
 
     page.style.position = (on? "absolute" : "");
-    page.style.width = (on? "calc(100% - "+right_space+")": "");
-    page.style.height = (on? "100%": "");
-    page.style.left = (on? "0px": "");
-    //page.style.right = (on? "0px": "");
-    page.style.top = (on? "0px": "");
-    //page.style.bottom = (on? "0px": "");
     page.style.margin = (on? "0px": "");
+
+    if(on)
+    {
+        switch(pos)
+        {
+        case 0:
+            page.style.top = ""+size+"px";
+            page.style.bottom= "";
+            page.style.left= "0px"
+            page.style.right = "";
+            page.style.width = "100%";
+            page.style.height = "calc(100% - "+size+"px)";
+            break;
+        case 1:
+            page.style.top = "0px";
+            page.style.bottom= "";
+            page.style.left= "0px"
+            page.style.right = "";
+            page.style.width = "calc(100% - "+size+"px)";
+            page.style.height = "100%";
+            break;
+        case 2:
+            page.style.top = "0px";
+            page.style.bottom= ""+size+"px";
+            page.style.left= "0px"
+            page.style.right = "";
+            page.style.width = "100%";
+            page.style.height = "calc(100% - "+size+"px)";
+            break;
+        case 3:
+            page.style.top = "0px";
+            page.style.bottom= "";
+            page.style.left= ""
+            page.style.right = "0px";
+            page.style.width = "calc(100% - "+size+"px)";
+            page.style.height = "100%";
+            break;
+        }
+    }
+    else
+    {
+            page.style.top = "";
+            page.style.bottom= "";
+            page.style.left= "";
+            page.style.right = "";
+            page.style.width = "";
+            page.style.height = "";
+    }
+
 
     var to_hide_sel = document.config["tohide_selector"]
     for (var ths in to_hide_sel)
@@ -260,18 +349,24 @@ function setfullscreen (on, right_space = "0px")
     return "Page fullscreen set "+(on ?"ON":"OFF");
 }
 
-function toggle_tab_full_view(nums) {
+function change_chords_panel(pos=1, size = 0) {
     var on = isfullscreen()
-    on = !on
-    setfullscreen(on, document.config["right_panel_width"])
-    setcolumns(on ? nums : 1)
-    displacechords(on)
+    setfullscreen(on, pos, size)
+    displacechords(on, pos, size)
 }
 
-function toggle_full_view(nums) {
+function toggle_tab_full_view(nums, pos=1, size=0) {
     var on = isfullscreen()
     on = !on
-    setfullscreen(on)
+    setfullscreen(on, pos, size)
+    setcolumns(on ? nums : 1)
+    displacechords(on, pos, size)
+}
+
+function toggle_full_view(nums, pos=1, size=0) {
+    var on = isfullscreen()
+    on = !on
+    setfullscreen(on, pos, size)
     setcolumns(on ? nums : 1)
 }
 
