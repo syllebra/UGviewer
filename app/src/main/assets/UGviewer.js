@@ -205,6 +205,15 @@ function displacechords(on, pos=1, size=0)
     //chords.style.background="#FFFFFF55";
     chords.style.background="#F8F8F8";
 
+    // Center
+    //var chords_block = document.querySelectorAll(document.config["chords_block_selector"]);
+    var chords_block = chords.querySelectorAll(":scope > div");
+    if(chords_block.length > 0)
+    {
+        chords_block[0].style.margin = (on? "auto":"");
+        chords_block[0].style.width = (on? "fit-content":"");
+    }
+
     if(on)
     {
         switch(pos)
