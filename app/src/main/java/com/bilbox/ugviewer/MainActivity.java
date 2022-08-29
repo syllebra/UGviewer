@@ -209,8 +209,8 @@ public class MainActivity extends Activity {
 
     protected int columns = 4;
     protected int font_size = 15;
-    protected int chords_pos = 1;
-    protected int chords_size = 210;
+    protected int chords_pos = 2;
+    protected int chords_size = 100;
 
 
     protected void saveTabOptions()
@@ -228,8 +228,8 @@ public class MainActivity extends Activity {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         columns = sharedPref.getInt(mWebView.getUrl()+"_COLS", 4);
         font_size = sharedPref.getInt(mWebView.getUrl()+"_FONT_SIZE", 15);
-        chords_pos = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_POS", 1);
-        chords_size = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_SIZE", 210);
+        chords_pos = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_POS", 2);
+        chords_size = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_SIZE", 90);
     }
 
     protected void setupPage() {
@@ -359,11 +359,11 @@ public class MainActivity extends Activity {
                     return event.getKeyCode() != KeyEvent.KEYCODE_A;
                 case KeyEvent.KEYCODE_O:
                 case KeyEvent.KEYCODE_PROG_RED:
-                    changeFontSize(-2);
+                    changeFontSize(-1);
                     return event.getKeyCode() != KeyEvent.KEYCODE_O;
                 case KeyEvent.KEYCODE_P:
                 case KeyEvent.KEYCODE_PROG_GREEN:
-                    changeFontSize(+2);
+                    changeFontSize(+1);
                     return event.getKeyCode() != KeyEvent.KEYCODE_P;
                 case KeyEvent.KEYCODE_C:
                 case 4020: // TCL command "T_ROND"
@@ -406,10 +406,10 @@ public class MainActivity extends Activity {
                 switch(event.getKeyCode())
                 {
                     case KeyEvent.KEYCODE_DPAD_DOWN:
-                        changeFontSize(-2);
+                        changeFontSize(-1);
                         return true;
                     case KeyEvent.KEYCODE_DPAD_UP:
-                        changeFontSize(2);
+                        changeFontSize(1);
                         return true;
                     case KeyEvent.KEYCODE_DPAD_LEFT:
                         changeColumnsCount(-1);
@@ -428,6 +428,10 @@ public class MainActivity extends Activity {
                     case KeyEvent.KEYCODE_DPAD_RIGHT: changeChordsPanelPos(1); return true;
                     case KeyEvent.KEYCODE_DPAD_DOWN: changeChordsPanelPos(2); return true;
                     case KeyEvent.KEYCODE_DPAD_LEFT: changeChordsPanelPos(3); return true;
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER:
+                        changeChordsPanelPos(-chords_pos);
+                        return true;
                 }
             }
             else

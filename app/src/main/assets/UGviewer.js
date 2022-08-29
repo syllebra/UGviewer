@@ -186,7 +186,7 @@ function toggleautoscroll() {
     }
 }
 
-//0: top, 1: right, 2: bottom, 4: left
+//0: top, 1: right, 2: bottom, 4: left, negative: hidden
 function displacechords(on, pos=1, size=0)
 {
     var sz = ""+size+"px";
@@ -206,13 +206,15 @@ function displacechords(on, pos=1, size=0)
     chords.style.background="#F8F8F8";
 
     // Center
-    //var chords_block = document.querySelectorAll(document.config["chords_block_selector"]);
-    var chords_block = chords.querySelectorAll(":scope > div");
+    var chords_block = document.querySelectorAll(document.config["chords_block_selector"]);
     if(chords_block.length > 0)
     {
         chords_block[0].style.margin = (on? "auto":"");
         chords_block[0].style.width = (on? "fit-content":"");
     }
+
+    var chords_visible = on && pos >=0;
+    chords.style.display = (chords_visible ? "" : "none");
 
     if(on)
     {
@@ -297,6 +299,7 @@ function setfullscreen (on, pos=1, size = 0)
     page.style.position = (on? "absolute" : "");
     page.style.margin = (on? "0px": "");
 
+
     if(on)
     {
         switch(pos)
@@ -331,6 +334,14 @@ function setfullscreen (on, pos=1, size = 0)
             page.style.left= ""
             page.style.right = "0px";
             page.style.width = "calc(100% - "+size+"px)";
+            page.style.height = "100%";
+            break;
+        default:
+            page.style.top = "0px";
+            page.style.bottom= "";
+            page.style.left= "0px"
+            page.style.right = "";
+            page.style.width = "100%";
             page.style.height = "100%";
             break;
         }
