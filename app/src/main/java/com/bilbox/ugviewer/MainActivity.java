@@ -211,6 +211,7 @@ public class MainActivity extends Activity {
     protected int font_size = 15;
     protected int chords_pos = 2;
     protected int chords_size = 100;
+    protected int chords_type = 0; // 0: guitar, 1: ukulele, 2: piano
     protected int capo = 0;
 
 
@@ -222,6 +223,7 @@ public class MainActivity extends Activity {
         editor.putInt(mWebView.getUrl()+"_FONT_SIZE", font_size);
         editor.putInt(mWebView.getUrl()+"_CHORDS_POS", chords_pos);
         editor.putInt(mWebView.getUrl()+"_CHORDS_SIZE", chords_size);
+        editor.putInt(mWebView.getUrl()+"_CHORDS_TYPE", chords_type);
         editor.putInt(mWebView.getUrl()+"_CAPO", capo);
         editor.apply();
     }
@@ -232,6 +234,7 @@ public class MainActivity extends Activity {
         font_size = sharedPref.getInt(mWebView.getUrl()+"_FONT_SIZE", 15);
         chords_pos = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_POS", 2);
         chords_size = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_SIZE", 90);
+        chords_type = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_TYPE", 0);
         capo = sharedPref.getInt(mWebView.getUrl()+"_CAPO", 0);
     }
 
@@ -254,18 +257,17 @@ public class MainActivity extends Activity {
             case TAB_CHORDS:
                 runJSfunction("toggle_tab_full_view(" + columns + ","+chords_pos+","+chords_size+")");
                 runJSfunction("force_current_font_size("+font_size+")");
-                changeCapo(0);
                 break;
             case TABS_LIST:
                 runJSfunction("set_tabs_list_all()");
                 runJSfunction("toggle_full_view(" + columns + ","+chords_pos+","+0+")");
-                changeCapo(0);
                 break;
             default:
                 runJSfunction("toggle_full_view(" + columns+ ","+chords_pos+","+0+")");
-                changeCapo(0);
                 break;
         }
+        changeChordsType(chords_type);
+        changeCapo(0);
     }
 
     public void changeFontSize(int change)
@@ -299,6 +301,13 @@ public class MainActivity extends Activity {
         if(capo<0)
             capo = 0;
         runJSfunction("showTopTextZone(\"Capo: "+(capo == 0 ? "No" : ""+capo)+"\")");
+        saveTabOptions();
+    }
+
+    public void changeChordsType(int type)
+    {
+        chords_type = type;
+        runJSfunction("set_chords_type("+chords_type+")");
         saveTabOptions();
     }
 
@@ -383,7 +392,7 @@ public class MainActivity extends Activity {
                     return event.getKeyCode() != KeyEvent.KEYCODE_P;
                 case KeyEvent.KEYCODE_C:
                 case 4020: // TCL command "T_ROND"
-                    runJSfunction("toggle_chords_type(1)");
+                    changeChordsType((chords_type+1)%3);
                     return event.getKeyCode() != KeyEvent.KEYCODE_C;
                 case KeyEvent.KEYCODE_L:
                 case KeyEvent.KEYCODE_MEDIA_REWIND:
@@ -486,10 +495,10 @@ public class MainActivity extends Activity {
                 switch(event.getKeyCode())
                 {
                     case KeyEvent.KEYCODE_DPAD_DOWN:
-                        runJSfunction("toggle_chords_type(-1)");
+                        changeChordsType(chords_type == 0 ? 2 : chords_type-1);
                         return true;
                     case KeyEvent.KEYCODE_DPAD_UP:
-                        runJSfunction("toggle_chords_type(1)");
+                        changeChordsType(chords_type == 2 ? 0 : chords_type+1);
                         return true;
                     case KeyEvent.KEYCODE_DPAD_LEFT:
                         changeTranspose(-1);

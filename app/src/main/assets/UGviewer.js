@@ -160,6 +160,11 @@ function generate_click(button)
     button.dispatchEvent(e);
  }
 
+function set_chords_type(type=0)
+{
+    generate_click(document.chords_button[type])
+}
+
 function toggle_chords_type(direction=1)
 {
     var i = get_active_chords_type()
@@ -168,9 +173,8 @@ function toggle_chords_type(direction=1)
 
     i = (i+direction)%document.chords_button.length
 
-    generate_click(document.chords_button[i])
+    set_chords_type(type=i)
 }
-
 
 function dec_font() { return generate_click(document.dec_font_button);}
 
