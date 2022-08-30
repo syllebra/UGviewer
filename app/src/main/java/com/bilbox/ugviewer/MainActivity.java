@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
     enum PageType {OTHERS, TABS_LIST, TAB_CHORDS};
     PageType mPageType = PageType.OTHERS;
 
-    enum CommandMode {NORMAL, SIZE, CHORDS_POS, CHORDS_SIZE, OTHERS}
+    enum CommandMode {NORMAL, SIZE, CHORDS_POS, CHORDS_SIZE, CAPO, OTHERS}
     CommandMode mCommandMode = CommandMode.NORMAL;
 
     private WebView mWebView = null;
@@ -211,6 +211,7 @@ public class MainActivity extends Activity {
     protected int font_size = 15;
     protected int chords_pos = 2;
     protected int chords_size = 100;
+    protected int capo = 0;
 
 
     protected void saveTabOptions()
@@ -221,6 +222,7 @@ public class MainActivity extends Activity {
         editor.putInt(mWebView.getUrl()+"_FONT_SIZE", font_size);
         editor.putInt(mWebView.getUrl()+"_CHORDS_POS", chords_pos);
         editor.putInt(mWebView.getUrl()+"_CHORDS_SIZE", chords_size);
+        editor.putInt(mWebView.getUrl()+"_CAPO", capo);
         editor.apply();
     }
     protected void loadTabOptions()
@@ -230,6 +232,7 @@ public class MainActivity extends Activity {
         font_size = sharedPref.getInt(mWebView.getUrl()+"_FONT_SIZE", 15);
         chords_pos = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_POS", 2);
         chords_size = sharedPref.getInt(mWebView.getUrl()+"_CHORDS_SIZE", 90);
+        capo = sharedPref.getInt(mWebView.getUrl()+"_CAPO", 0);
     }
 
     protected void setupPage() {
@@ -251,13 +254,16 @@ public class MainActivity extends Activity {
             case TAB_CHORDS:
                 runJSfunction("toggle_tab_full_view(" + columns + ","+chords_pos+","+chords_size+")");
                 runJSfunction("force_current_font_size("+font_size+")");
+                changeCapo(0);
                 break;
             case TABS_LIST:
                 runJSfunction("set_tabs_list_all()");
                 runJSfunction("toggle_full_view(" + columns + ","+chords_pos+","+0+")");
+                changeCapo(0);
                 break;
             default:
                 runJSfunction("toggle_full_view(" + columns+ ","+chords_pos+","+0+")");
+                changeCapo(0);
                 break;
         }
     }
@@ -284,6 +290,15 @@ public class MainActivity extends Activity {
     {
         chords_pos = newpos;
         runJSfunction("change_chords_panel("+chords_pos+","+chords_size+")");
+        saveTabOptions();
+    }
+
+    public void changeCapo(int change)
+    {
+        capo = capo+change;
+        if(capo<0)
+            capo = 0;
+        runJSfunction("showTopTextZone(\"Capo: "+(capo == 0 ? "No" : ""+capo)+"\")");
         saveTabOptions();
     }
 
@@ -320,7 +335,8 @@ public class MainActivity extends Activity {
             case NORMAL: setCommandMode(CommandMode.SIZE); break;
             case SIZE: setCommandMode(CommandMode.CHORDS_POS); break;
             case CHORDS_POS: setCommandMode(CommandMode.CHORDS_SIZE); break;
-            case CHORDS_SIZE: setCommandMode(CommandMode.OTHERS); break;
+            case CHORDS_SIZE: setCommandMode(CommandMode.CAPO); break;
+            case CAPO: setCommandMode(CommandMode.OTHERS); break;
             case OTHERS: setCommandMode(CommandMode.NORMAL); break;
         }
         Log.w("app","Changed command mode to:" + mCommandMode);
@@ -446,6 +462,21 @@ public class MainActivity extends Activity {
                     case KeyEvent.KEYCODE_DPAD_UP:
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
                         changeChordsPanelSize(20);
+                        return true;
+                }
+            }
+            else
+            if(mCommandMode == CommandMode.CAPO)
+            {
+                switch(event.getKeyCode())
+                {
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        changeCapo(-1);
+                        return true;
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        changeCapo(1);
                         return true;
                 }
             }

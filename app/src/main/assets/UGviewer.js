@@ -436,17 +436,42 @@ function createInfoZone()
     square.innerHTML = "<b>TEST</b>";
     square.style.fontSize = "30px";
     square.style.height = '0';
-    square.style.width = '120px';
+    square.style.width = 'fit-content';
     square.style.zIndex = '20000';
     square.style.position = 'fixed';
     square.style.backgroundColor = 'rgb(0,0,0)';
     square.style.backgroundColor = 'rgb(0,0,0,0.7)';
     square.style.textAlign = 'center';
     square.style.margin = 'auto';
+    square.style.padding = '5px';
     square.style.overflowX= 'hidden';
     square.style.transition= '0.5s';
     square.style.right = 0;
     square.style.bottom = 0;
+    document.body.appendChild(square)
+}
+
+function createTopTextZone()
+{
+    const square = document.createElement('div');
+    square.id = "top_text_zone";
+    square.innerHTML = "<b>TEST</b>";
+    square.style.fontSize = "20px";
+    square.style.fontStyle = "italic";
+    square.style.height = '0';
+    square.style.width = 'fit-content';
+    square.style.zIndex = '20000';
+    square.style.position = 'fixed';
+    //square.style.backgroundColor = 'rgb(0,0,0)';
+    //square.style.backgroundColor = 'rgb(0,0,0,0.7)';
+    square.style.color= "#555";
+    square.style.textAlign = 'center';
+    square.style.margin = 'auto';
+    square.style.padding = '5px';
+    square.style.overflowX= 'hidden';
+    square.style.transition= '0.5s';
+    square.style.right = 0;
+    square.style.top = 0;
     document.body.appendChild(square)
 }
 
@@ -457,11 +482,19 @@ function showInfoZone(text="")
     square.children[0].innerHTML = text;
 }
 
+function showTopTextZone(text="")
+{
+    var square = document.getElementById("top_text_zone");
+    square.style.height = (text == "" ? '0px' : '50px');
+    square.children[0].innerHTML = text;
+}
+
 load_config(
     () => {
         setup_buttons();
         set_tabs_style();
         createInfoZone();
+        createTopTextZone();
         AndroidInterface.onJSfullyLoad();
     }
 );
